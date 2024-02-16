@@ -69,6 +69,8 @@ pub fn make_cross(ctx: &mut BuildContext, size: f32, thickness: f32) -> Handle<U
         WidgetBuilder::new()
             .with_horizontal_alignment(HorizontalAlignment::Center)
             .with_vertical_alignment(VerticalAlignment::Center)
+            .with_width(size)
+            .with_height(size)
             .with_foreground(BRUSH_BRIGHT),
     )
     .with_primitives(vec![
