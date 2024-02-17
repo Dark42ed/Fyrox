@@ -362,14 +362,34 @@ impl Control for MenuItem {
                 WidgetMessage::MouseDown { .. } => {
                     let menu = find_menu(self.parent(), ui);
                     if menu.is_some() {
-                        // Activate menu so it user will be able to open submenus by
-                        // mouse hover.
-                        ui.send_message(MenuMessage::activate(menu, MessageDirection::ToWidget));
+                        let immediate_parent = ui
+                            .find_up(self.parent(), &mut |ancestor| {
+                                ancestor.cast::<Menu>().is_some()
+                            })
+                            .is_some();
+                        let popup = ui
+                            .node(*self.popup)
+                            .cast::<Popup>()
+                            .expect("Must be popup!");
+                        if *popup.is_open && immediate_parent {
+                            // Deactivating menu also closes popup.
+                            ui.send_message(MenuMessage::deactivate(
+                                menu,
+                                MessageDirection::ToWidget,
+                            ));
+                        } else {
+                            // Activate menu so it user will be able to open submenus by
+                            // mouse hover.
+                            ui.send_message(MenuMessage::activate(
+                                menu,
+                                MessageDirection::ToWidget,
+                            ));
 
-                        ui.send_message(MenuItemMessage::open(
-                            self.handle(),
-                            MessageDirection::ToWidget,
-                        ));
+                            ui.send_message(MenuItemMessage::open(
+                                self.handle(),
+                                MessageDirection::ToWidget,
+                            ));
+                        }
                     }
                 }
                 WidgetMessage::MouseUp { .. } => {
