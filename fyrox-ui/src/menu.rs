@@ -586,26 +586,33 @@ impl Control for MenuItem {
                         }
                     }
                     MenuItemMessage::Close { deselect } => {
-                        ui.send_message(PopupMessage::close(
-                            *self.items_panel,
-                            MessageDirection::ToWidget,
-                        ));
+                        let context_menu = ui
+                            .node(*self.items_panel)
+                            .cast::<ContextMenu>()
+                            .expect("Must be popup");
 
-                        if *deselect && *self.is_selected {
-                            ui.send_message(MenuItemMessage::select(
-                                self.handle,
+                        if *context_menu.popup.is_open {
+                            ui.send_message(PopupMessage::close(
+                                *self.items_panel,
                                 MessageDirection::ToWidget,
-                                false,
                             ));
-                        }
 
-                        // Recursively deselect everything in the sub-items container.
-                        for &item in &*self.items_container.items {
-                            ui.send_message(MenuItemMessage::close(
-                                item,
-                                MessageDirection::ToWidget,
-                                true,
-                            ));
+                            if *deselect && *self.is_selected {
+                                ui.send_message(MenuItemMessage::select(
+                                    self.handle,
+                                    MessageDirection::ToWidget,
+                                    false,
+                                ));
+                            }
+
+                            // Recursively deselect everything in the sub-items container.
+                            for &item in &*self.items_container.items {
+                                ui.send_message(MenuItemMessage::close(
+                                    item,
+                                    MessageDirection::ToWidget,
+                                    true,
+                                ));
+                            }
                         }
                     }
                     MenuItemMessage::Click => {}
