@@ -361,8 +361,8 @@ impl CheckBoxBuilder {
 
     /// Finishes check box building and adds it to the user interface.
     pub fn build(self, ctx: &mut BuildContext) -> Handle<UiNode> {
+        let size = *ctx.style.property(CheckBox::CHECK_MARK_SIZE);
         let check_mark = self.check_mark.unwrap_or_else(|| {
-            let size = *ctx.style.property(CheckBox::CHECK_MARK_SIZE);
             let half_size = size * 0.5;
 
             BorderBuilder::new(
@@ -373,9 +373,8 @@ impl CheckBoxBuilder {
                             WidgetBuilder::new()
                                 .with_vertical_alignment(VerticalAlignment::Center)
                                 .with_horizontal_alignment(HorizontalAlignment::Center)
-                                // Give some padding to ensure primitives don't get too cut off
-                                .with_width(size + 1.0)
-                                .with_height(size + 1.0)
+                                .with_width(size)
+                                .with_height(size)
                                 .with_foreground(ctx.style.property(Style::BRUSH_TEXT)),
                         )
                         .with_primitives({
@@ -406,8 +405,8 @@ impl CheckBoxBuilder {
             BorderBuilder::new(
                 WidgetBuilder::new()
                     .with_margin(Thickness::uniform(3.0))
-                    .with_width(10.0)
-                    .with_height(9.0)
+                    .with_width(size)
+                    .with_height(size)
                     .with_background(Brush::Solid(Color::TRANSPARENT).into())
                     .with_foreground(Brush::Solid(Color::TRANSPARENT).into()),
             )
